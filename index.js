@@ -18,6 +18,10 @@ app.get('/',(req,res)=>{
 
 app.get('/getDetails',db.getDetails)
 app.get('/getDetailsByID/:id',db.getDetailsByID)
+app.post('/createdata',db.createdata)
+app.put('/updatedata/:id',db.updatedata)
+app.delete('/deletedata/:id',db.deletedata)
+
 
 app.listen(port,()=>{
     console.log("server is running on port number :3000")
