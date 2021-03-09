@@ -7,6 +7,8 @@ const pool=new Pool({
     port:5432
 })
 
+
+
 const getDetails=(req,res)=>{
     pool.query("select car_id,car_name,model_name,make_name from car left join make on car.make_id=make.make_id left join model on car.model_id=model.model_id",(err,result)=>{
         if(err)
@@ -244,11 +246,41 @@ const deletedata=(req,res)=>{
     })
 }
 
+const getcarImage=(req,res)=>{
+    const id=parseInt(req.params.id)
+    pool.query("Select imagepath from carimage where car_id=$1",[id],(err,result)=>{
+        if(err)
+        {
+            throw err
+        }
+        if(result.rowCount<=0)
+        {
+            res.json("No data Found")
+        }
+        else{
+            let values= [];
+            for(i=0;i<result.rowCount;i++)
+            {
+                values.push('http://localhost:3000/images/'+result.rows[i].imagepath);
+            }
+            pool.query("select car.car_id,car_name,model_name,make_name,array_agg(imagepath) from carimage, car left join make on make.make_id=car.make_id left join model on model.model_id=car.model_id where car.car_id=$1",[id],(err1,res1)=>{
+                if(err1)
+                {
+                    throw err1
+                }
+                res.status(200).json({car:res1.rows,im:values,image:result.rows})
+            })
+        
+        }
+    })
+}
+
 
 module.exports={
     getDetails,
     getDetailsByID,
     createdata,
     updatedata,
-    deletedata
+    deletedata,
+    getcarImage
 }
